@@ -51,7 +51,7 @@ export default function LoginPage() {
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             Welcome Back
           </CardTitle>
-          <CardDescription className="text-slate-400">Sign in to continue your career journey</CardDescription>
+          <CardDescription className="text-slate-400">Sign in to continue your AI conversations</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
@@ -110,7 +110,7 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
-            <p className="text-center text-xs text-slate-500 mt-2">Demo: Use admin@careerforge.ai for admin access</p>
+
           </CardFooter>
         </form>
       </Card>

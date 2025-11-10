@@ -2,13 +2,13 @@
 
 import type { ReactNode } from "react"
 import { Sidebar } from "@/components/sidebar"
-import { TopBar } from "@/components/top-bar"
+import { Header } from "@/components/header"
 
-interface AppLayoutProps {
+interface MainLayoutProps {
   children: ReactNode
 }
 
-export function AppLayout({ children }: AppLayoutProps) {
+export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-slate-900">
       {/* Animated background effects */}
@@ -20,7 +20,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div className="flex h-screen relative z-10">
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
-          <TopBar />
+          <Header />
           <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>

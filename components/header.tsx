@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Bell, Search, LogOut, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export function AdminTopBar() {
+export function Header() {
   const router = useRouter()
 
   const handleLogout = () => {
@@ -29,8 +29,8 @@ export function AdminTopBar() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
           <Input
             type="search"
-            placeholder="Search users, subscriptions, content..."
-            className="pl-10 bg-slate-800/50 border-slate-700 focus:border-purple-500 focus:ring-purple-500/20"
+            placeholder="Search conversations..."
+            className="pl-10 bg-slate-800/50 border-slate-700 focus:border-blue-500 focus:ring-blue-500/20"
           />
         </div>
       </div>
@@ -40,25 +40,24 @@ export function AdminTopBar() {
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative text-slate-400 hover:text-slate-200">
           <Bell className="h-5 w-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
         </Button>
 
-        {/* Admin menu */}
+        {/* User menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="gap-2 hover:bg-slate-800/50">
-              <Avatar className="h-8 w-8 ring-2 ring-purple-500/50">
+              <Avatar className="h-8 w-8 ring-2 ring-blue-500/50">
                 <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white">AD</AvatarFallback>
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white">JD</AvatarFallback>
               </Avatar>
               <div className="text-left hidden md:block">
-                <p className="text-sm font-medium text-slate-200">Admin</p>
-                <p className="text-xs text-slate-500">Administrator</p>
+                <p className="text-sm font-medium text-slate-200">John Doe</p>
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-800">
-            <DropdownMenuLabel className="text-slate-400">Admin Account</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-slate-400">My Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-slate-800" />
             <DropdownMenuItem className="text-slate-300 focus:bg-slate-800 focus:text-slate-100">
               <User className="mr-2 h-4 w-4" />

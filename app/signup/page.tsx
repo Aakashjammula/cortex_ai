@@ -30,7 +30,7 @@ export default function SignupPage() {
 
     // Mock signup - in real app, create user account
     if (formData.password === formData.confirmPassword) {
-      router.push("/dashboard")
+      router.push("/chat")
     }
 
     setIsLoading(false)
@@ -55,7 +55,7 @@ export default function SignupPage() {
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             Create Account
           </CardTitle>
-          <CardDescription className="text-slate-400">Start building your career with AI</CardDescription>
+          <CardDescription className="text-slate-400">Start your AI conversation journey</CardDescription>
         </CardHeader>
         <form onSubmit={handleSignup}>
           <CardContent className="space-y-4">
