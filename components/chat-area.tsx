@@ -40,7 +40,7 @@ export function ChatArea() {
       id: "1",
       role: "assistant",
       content:
-        "Hey there! 👋 I'm Cortex, your AI career assistant. I'm here to help you navigate your career journey, answer questions about skills, job opportunities, and more. What can I help you with today?",
+        "Hey there! 👋 I'm Cortex, your AI career assistant. What can I help you with today?",
       timestamp: new Date(),
     },
   ])

@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Sparkles, ArrowRight, Mail, Lock, User } from "lucide-react"
+import { ArrowRight, Mail, Lock, User } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 export default function SignupPage() {
   const router = useRouter()
@@ -48,8 +49,14 @@ export default function SignupPage() {
       <Card className="w-full max-w-md relative z-10 bg-slate-900/80 backdrop-blur-xl border-blue-500/20 shadow-2xl shadow-blue-500/10">
         <CardHeader className="space-y-1 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl shadow-lg shadow-blue-500/50 animate-glow">
-              <Sparkles className="h-6 w-6 text-white" />
+            <div className="w-16 h-16 relative">
+              <Image
+                src="/logo.png"
+                alt="Cortex AI"
+                width={64}
+                height={64}
+                className="w-full h-full"
+              />
             </div>
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
