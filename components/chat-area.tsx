@@ -15,6 +15,8 @@ import {
   Lightbulb,
   BookOpen,
   MoreHorizontal,
+  Volume2,
+  VolumeX,
 } from "lucide-react"
 import Image from "next/image"
 
@@ -49,7 +51,11 @@ async function queryAgent(text: string): Promise<string[]> {
   }
 }
 
-async function playTTS(text: string, voice = "af_heart", langCode = "a"): Promise<void> {
+async function playTTS(
+  text: string,
+  voice = "af_heart",
+  langCode = "a",
+): Promise<HTMLAudioElement | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/tts/play`, {
       method: "POST",
@@ -66,29 +72,17 @@ async function playTTS(text: string, voice = "af_heart", langCode = "a"): Promis
     if (!response.ok) {
       throw new Error("Failed to play TTS")
     }
+
+    const audioBlob = await response.blob()
+    const audioUrl = URL.createObjectURL(audioBlob)
+
+    const audio = new Audio(audioUrl)
+    audio.play()
+
+    return audio
   } catch (error) {
     console.error("Error playing TTS:", error)
-  }
-}
-
-async function stopTTS(): Promise<void> {
-  try {
-    await fetch(`${API_BASE_URL}/tts/stop`, {
-      method: "POST",
-    })
-  } catch (error) {
-    console.error("Error stopping TTS:", error)
-  }
-}
-
-async function getTTSStatus(): Promise<boolean> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/tts/status`)
-    const data = await response.json()
-    return data.playing || false
-  } catch (error) {
-    console.error("Error getting TTS status:", error)
-    return false
+    return null
   }
 }
 
@@ -105,7 +99,9 @@ export function ChatArea() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [showToolsMenu, setShowToolsMenu] = useState(false)
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -114,6 +110,56 @@ export function ChatArea() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  const handleSpeak = async (messageId: string, content: string) => {
+    // If already speaking this message, stop it
+    if (speakingMessageId === messageId) {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+      setSpeakingMessageId(null)
+      return
+    }
+
+    // Stop any ongoing speech
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current = null
+    }
+
+    // Play TTS using backend
+    setSpeakingMessageId(messageId)
+    const audio = await playTTS(content)
+
+    if (audio) {
+      audioRef.current = audio
+
+      // Handle audio end
+      audio.onended = () => {
+        setSpeakingMessageId(null)
+        audioRef.current = null
+      }
+
+      // Handle audio error
+      audio.onerror = () => {
+        setSpeakingMessageId(null)
+        audioRef.current = null
+      }
+    } else {
+      setSpeakingMessageId(null)
+    }
+  }
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    }
+  }, [])
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -168,7 +214,7 @@ export function ChatArea() {
           <div key={message.id} className="w-full py-6 px-4">
             {message.role === "assistant" ? (
               // AI Message - Left side, full width
-              <div className="max-w-3xl mx-auto flex gap-6">
+              <div className="max-w-3xl mx-auto flex gap-6 group">
                 <div className="flex-shrink-0">
                   <Image
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-P9jArLRBCsMzOMP9bnPFEuMxda47cp.png"
@@ -181,6 +227,21 @@ export function ChatArea() {
                 <div className="flex-1 min-w-0">
                   <div className="text-white/90 text-[15px] leading-7 whitespace-pre-wrap break-words">
                     {message.content}
+                  </div>
+                  <div className="mt-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleSpeak(message.id, message.content)}
+                      className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
+                      title={speakingMessageId === message.id ? "Stop speaking" : "Speak out"}
+                    >
+                      {speakingMessageId === message.id ? (
+                        <VolumeX className="h-4 w-4" />
+                      ) : (
+                        <Volume2 className="h-4 w-4" />
+                      )}
+                    </Button>
                   </div>
                 </div>
               </div>
