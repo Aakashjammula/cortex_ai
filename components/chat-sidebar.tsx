@@ -28,6 +28,10 @@ export function ChatSidebar() {
   }
 
   const handleLogout = () => {
+    // Clear authentication data
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    // Redirect to login
     router.push("/login")
   }
 

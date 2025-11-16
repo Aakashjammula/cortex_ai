@@ -2,35 +2,68 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight, Mail, Lock } from "lucide-react"
+import { ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+
+  // Redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (token) {
+      router.push("/chat")
+    }
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username_or_email: email,
+          password: password,
+        }),
+      })
 
-    // Mock authentication - in real app, validate credentials
-    if (email && password) {
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Invalid credentials")
+      }
+
+      // Store token and user info
+      localStorage.setItem("token", data.access_token)
+      localStorage.setItem("user", JSON.stringify(data.user))
+
+      // Redirect to chat
       router.push("/chat")
+    } catch (err: any) {
+      setError(err.message || "Failed to login. Please check your credentials.")
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   return (
@@ -62,16 +95,21 @@ export default function LoginPage() {
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3">
+                <p className="text-red-400 text-sm">{error}</p>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-slate-300">
-                Email
+                Email or Username
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="you@example.com"
+                  type="text"
+                  placeholder="you@example.com or username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 bg-slate-800/50 border-slate-700 focus:border-blue-500 focus:ring-blue-500/20"
@@ -87,13 +125,20 @@ export default function LoginPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 bg-slate-800/50 border-slate-700 focus:border-blue-500 focus:ring-blue-500/20"
+                  className="pl-10 pr-10 bg-slate-800/50 border-slate-700 focus:border-blue-500 focus:ring-blue-500/20"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
             <div className="flex items-center justify-between text-sm">

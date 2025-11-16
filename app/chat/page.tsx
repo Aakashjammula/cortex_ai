@@ -5,10 +5,23 @@ import type React from "react"
 import { ChatSidebar } from "@/components/chat-sidebar"
 import { ChatArea } from "@/components/chat-area"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function ChatPage() {
   const [sidebarWidth, setSidebarWidth] = useState(260)
   const [isDragging, setIsDragging] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem("token")
+    if (!token) {
+      router.push("/login")
+    } else {
+      setIsAuthenticated(true)
+    }
+  }, [router])
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -40,6 +53,15 @@ export default function ChatPage() {
       document.body.style.userSelect = ""
     }
   }, [isDragging])
+
+  // Show loading while checking authentication
+  if (!isAuthenticated) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-black">
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-screen flex bg-black overflow-hidden">

@@ -25,13 +25,71 @@ interface Message {
   timestamp: Date
 }
 
-function generateMockResponse(input: string): string {
-  const responses = [
-    "That's a great question! Based on current market trends, I'd recommend focusing on developing skills in areas like AI, cloud computing, and data analysis.",
-    "I can help you with that. Have you considered exploring roles in product management or technical leadership? These are high-demand positions right now.",
-    "Excellent point! Building a strong portfolio is crucial. I'd suggest creating projects that showcase your problem-solving abilities and technical expertise.",
-  ]
-  return responses[Math.floor(Math.random() * responses.length)]
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+
+async function queryAgent(text: string): Promise<string[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/agent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query: text }),
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to get response from agent")
+    }
+
+    const data = await response.json()
+    return data.responses || []
+  } catch (error) {
+    console.error("Error querying agent:", error)
+    return ["Sorry, I couldn't connect to the AI agent. Please make sure the backend is running."]
+  }
+}
+
+async function playTTS(text: string, voice = "af_heart", langCode = "a"): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/tts/play`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text,
+        voice,
+        lang_code: langCode,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to play TTS")
+    }
+  } catch (error) {
+    console.error("Error playing TTS:", error)
+  }
+}
+
+async function stopTTS(): Promise<void> {
+  try {
+    await fetch(`${API_BASE_URL}/tts/stop`, {
+      method: "POST",
+    })
+  } catch (error) {
+    console.error("Error stopping TTS:", error)
+  }
+}
+
+async function getTTSStatus(): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/tts/status`)
+    const data = await response.json()
+    return data.playing || false
+  } catch (error) {
+    console.error("Error getting TTS status:", error)
+    return false
+  }
 }
 
 export function ChatArea() {
@@ -70,16 +128,20 @@ export function ChatArea() {
     }
 
     setMessages((prev) => [...prev, userMessage])
+    const userQuery = input
     setInput("")
     setIsLoading(true)
 
-    // Simulate AI response
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Query the AI agent backend
+    const responses = await queryAgent(userQuery)
+
+    // Combine all responses into one message
+    const fullResponse = responses.join("\n\n")
 
     const assistantMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: "assistant",
-      content: generateMockResponse(input),
+      content: fullResponse,
       timestamp: new Date(),
     }
 
