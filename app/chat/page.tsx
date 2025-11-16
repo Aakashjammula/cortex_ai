@@ -11,6 +11,7 @@ export default function ChatPage() {
   const [sidebarWidth, setSidebarWidth] = useState(260)
   const [isDragging, setIsDragging] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -65,7 +66,11 @@ export default function ChatPage() {
 
   return (
     <div className="h-screen flex bg-black overflow-hidden">
-      <div style={{ width: `${sidebarWidth}px` }} className="flex-shrink-0 relative">
+      {/* Desktop Sidebar */}
+      <div
+        style={{ width: `${sidebarWidth}px` }}
+        className="hidden md:flex flex-shrink-0 relative"
+      >
         <ChatSidebar />
         <div
           onMouseDown={handleMouseDown}
@@ -75,7 +80,21 @@ export default function ChatPage() {
           <div className="absolute right-0 top-0 h-full w-1 bg-slate-700/50 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       </div>
-      <ChatArea />
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          <div className="w-[280px] bg-[#171717]">
+            <ChatSidebar onClose={() => setIsMobileSidebarOpen(false)} />
+          </div>
+          <div
+            className="flex-1 bg-black/50"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+        </div>
+      )}
+
+      <ChatArea onMenuClick={() => setIsMobileSidebarOpen(true)} />
     </div>
   )
 }

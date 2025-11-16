@@ -1,12 +1,16 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { PenSquare, MessageSquare, Trash2, User, PanelLeft, Settings, LogOut } from "lucide-react"
+import { PenSquare, MessageSquare, Trash2, User, PanelLeft, Settings, LogOut, X } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 
-export function ChatSidebar() {
+interface ChatSidebarProps {
+  onClose?: () => void
+}
+
+export function ChatSidebar({ onClose }: ChatSidebarProps = {}) {
   const router = useRouter()
   const [chats, setChats] = useState([
     { id: 1, name: "Career Path Discussion" },
@@ -37,7 +41,7 @@ export function ChatSidebar() {
 
   return (
     <div className="w-full h-full bg-[#171717] flex flex-col">
-        {/* Logo and Minimize Button */}
+        {/* Logo and Close/Minimize Button */}
         <div className="flex items-center justify-between p-3">
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-P9jArLRBCsMzOMP9bnPFEuMxda47cp.png"
@@ -49,9 +53,10 @@ export function ChatSidebar() {
           <Button
             variant="ghost"
             size="icon"
+            onClick={onClose}
             className="text-white/70 hover:bg-white/10 hover:text-white h-9 w-9"
           >
-            <PanelLeft className="h-5 w-5" />
+            {onClose ? <X className="h-5 w-5" /> : <PanelLeft className="h-5 w-5" />}
           </Button>
         </div>
 

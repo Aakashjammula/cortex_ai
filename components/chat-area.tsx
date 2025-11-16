@@ -17,6 +17,7 @@ import {
   MoreHorizontal,
   Volume2,
   VolumeX,
+  Menu,
 } from "lucide-react"
 import Image from "next/image"
 
@@ -86,7 +87,11 @@ async function playTTS(
   }
 }
 
-export function ChatArea() {
+interface ChatAreaProps {
+  onMenuClick?: () => void
+}
+
+export function ChatArea({ onMenuClick }: ChatAreaProps = {}) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -199,10 +204,21 @@ export function ChatArea() {
     <div className="flex-1 flex flex-col bg-[#212121] overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-        <button className="flex items-center gap-2 text-white hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors">
-          <span className="text-lg font-semibold">Cortex 5</span>
-          <ChevronDown className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMenuClick}
+            className="md:hidden text-white hover:bg-white/10 h-9 w-9"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <button className="flex items-center gap-2 text-white hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors">
+            <span className="text-lg font-semibold">Cortex 5</span>
+            <ChevronDown className="h-4 w-4" />
+          </button>
+        </div>
         <Button variant="ghost" className="text-white hover:bg-white/10 text-sm">
           Share
         </Button>
@@ -211,10 +227,10 @@ export function ChatArea() {
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto">
         {messages.map((message) => (
-          <div key={message.id} className="w-full py-6 px-4">
+          <div key={message.id} className="w-full py-4 md:py-6 px-3 md:px-4">
             {message.role === "assistant" ? (
               // AI Message - Left side, full width
-              <div className="max-w-3xl mx-auto flex gap-6 group">
+              <div className="max-w-3xl mx-auto flex gap-3 md:gap-6 group">
                 <div className="flex-shrink-0">
                   <Image
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-P9jArLRBCsMzOMP9bnPFEuMxda47cp.png"
@@ -248,7 +264,7 @@ export function ChatArea() {
             ) : (
               // User Message - Right side, grey bubble
               <div className="max-w-3xl mx-auto flex justify-end">
-                <div className="max-w-[70%] bg-[#2f2f2f] rounded-3xl px-5 py-3">
+                <div className="max-w-[85%] md:max-w-[70%] bg-[#2f2f2f] rounded-3xl px-4 md:px-5 py-3">
                   <div className="text-white/90 text-[15px] leading-7 whitespace-pre-wrap break-words">
                     {message.content}
                   </div>
@@ -259,8 +275,8 @@ export function ChatArea() {
         ))}
 
         {isLoading && (
-          <div className="w-full py-6 px-4">
-            <div className="max-w-3xl mx-auto flex gap-6">
+          <div className="w-full py-4 md:py-6 px-3 md:px-4">
+            <div className="max-w-3xl mx-auto flex gap-3 md:gap-6">
               <div className="flex-shrink-0">
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-P9jArLRBCsMzOMP9bnPFEuMxda47cp.png"
@@ -291,7 +307,7 @@ export function ChatArea() {
       </div>
 
       {/* Input Area */}
-      <div className="bg-[#212121] px-4 py-4">
+      <div className="bg-[#212121] px-3 md:px-4 py-3 md:py-4">
         <div className="max-w-3xl mx-auto">
           <div className="relative">
             {/* Tools Dropdown Menu */}
